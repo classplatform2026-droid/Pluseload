@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #090d16;
+    color: #f1f5f9;
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Custom sleek scrollbar for logs and code editors */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+::-webkit-scrollbar-thumb {
+  background: #23304a;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334566;
+}
+
+/* Print Styles for PDF Export */
+@media print {
+  /* Hide non-report elements during printing */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only the printable report container */
+  #printable-pdf-report,
+  #printable-pdf-report * {
+    visibility: visible;
+  }
+
+  #printable-pdf-report {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 24px !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Ensure background colors and borders print sharply */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-text-dark {
+    color: #0f172a !important;
+  }
+
+  .print-bg-light {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+  }
+}
