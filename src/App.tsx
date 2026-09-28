@@ -50,7 +50,7 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [maxConcurrency, setMaxConcurrency] = useState(50);
   const [defaultTimeout, setDefaultTimeout] = useState(5000);
-  const [userAgent, setUserAgent] = useState('PulseLoad/1.0 (Stress Testing Agent)');
+  const [userAgent, setUserAgent] = useState('loadtst/1.0 (Stress Testing Agent)');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -66,7 +66,7 @@ export default function App() {
   // Load saved configurations and history on first load
   useEffect(() => {
     // Load saved scenarios from localStorage
-    const saved = localStorage.getItem('pulseload_scenarios');
+    const saved = localStorage.getItem('loadtst_scenarios');
     if (saved) {
       try {
         setScenarios(JSON.parse(saved));
@@ -220,7 +220,7 @@ export default function App() {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(snapshot, null, 2));
     const dlAnchor = document.createElement('a');
     dlAnchor.setAttribute('href', dataStr);
-    dlAnchor.setAttribute('download', `pulseload-report-${snapshot.id}.json`);
+    dlAnchor.setAttribute('download', `loadtst-report-${snapshot.id}.json`);
     dlAnchor.click();
   };
 
@@ -242,7 +242,7 @@ export default function App() {
     const csvContent = 'data:text/csv;charset=utf-8,' + [headersLine.join(','), ...rows.map((e) => e.join(','))].join('\n');
     const dlAnchor = document.createElement('a');
     dlAnchor.setAttribute('href', encodeURI(csvContent));
-    dlAnchor.setAttribute('download', `pulseload-logs-${snapshot.id}.csv`);
+    dlAnchor.setAttribute('download', `loadtst-logs-${snapshot.id}.csv`);
     dlAnchor.click();
   };
 
@@ -311,13 +311,13 @@ export default function App() {
 
     const updated = [newScenario, ...scenarios];
     setScenarios(updated);
-    localStorage.setItem('pulseload_scenarios', JSON.stringify(updated));
+    localStorage.setItem('loadtst_scenarios', JSON.stringify(updated));
   };
 
   const handleDeleteScenario = (id: string) => {
     const updated = scenarios.filter((s) => s.id !== id);
     setScenarios(updated);
-    localStorage.setItem('pulseload_scenarios', JSON.stringify(updated));
+    localStorage.setItem('loadtst_scenarios', JSON.stringify(updated));
   };
 
   const handleClearHistory = () => {
@@ -443,7 +443,7 @@ export default function App() {
         {/* Minimal Footer adhering to anti-slop */}
         <footer className="border-t border-slate-900 bg-slate-950/80 px-4 sm:px-6 py-3.5 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-300">PulseLoad</span>
+            <span className="font-semibold text-slate-300">loadtst</span>
             <span>·</span>
             <span>Real-time HTTP Load Testing & Observability</span>
           </div>
@@ -459,7 +459,7 @@ export default function App() {
 
       {/* Toast Notification Banner */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 max-w-md bg-slate-900 border border-rose-500/80 text-rose-200 px-4 py-3 rounded-xl shadow-2xl flex items-center justify-between gap-3 text-xs font-mono animate-in slide-in-from-bottom duration-200">
+        <div className="fixed bottom-6 right-6 z-50 max-w-md bg-slate-900 border border-rose-500/80 text-rose-200 px-4 py-3 rounded-xl shadow-2xl flex items-center justify-between gap-3 text-xs font-medium">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
             <span>{toastMessage}</span>
@@ -486,7 +486,7 @@ export default function App() {
         onResetDefaults={() => {
           setMaxConcurrency(50);
           setDefaultTimeout(5000);
-          setUserAgent('PulseLoad/1.0 (Stress Testing Agent)');
+          setUserAgent('loadtst/1.0 (Stress Testing Agent)');
         }}
       />
 

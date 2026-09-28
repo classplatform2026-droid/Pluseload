@@ -33,7 +33,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`loadtster server running at http://0.0.0.0:${PORT}`);
+    console.log(`loadtst server running at http://0.0.0.0:${PORT}`);
   });
 }
 

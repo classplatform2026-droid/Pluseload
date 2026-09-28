@@ -96,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {(!isCollapsedDesktop || isOpenMobile) && (
             <div className="flex flex-col">
               <span className="text-base font-extrabold tracking-tight text-white flex items-center gap-1.5">
-                PulseLoad
+                loadtst
                 <span className="text-[10px] px-1.5 py-0.2 rounded font-mono font-medium bg-cyan-950 text-cyan-400 border border-cyan-800">
                   v1.2
                 </span>
@@ -123,7 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onStopTest();
               setIsOpenMobile(false);
             }}
-            className="w-full h-10 px-3 flex items-center justify-center gap-2 bg-rose-950/90 hover:bg-rose-900 border border-rose-800 text-rose-200 font-bold text-xs rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
+            className="w-full h-10 px-3 flex items-center justify-center gap-2 bg-rose-950/90 hover:bg-rose-900 border border-rose-800 text-rose-200 font-bold text-xs rounded-xl shadow-md transition-all"
           >
             <Square className="w-4 h-4 fill-rose-400 text-rose-400" />
             {(!isCollapsedDesktop || isOpenMobile) && <span>Stop Active Test</span>}
@@ -134,7 +134,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onStartTest();
               setIsOpenMobile(false);
             }}
-            className="w-full h-10 px-3 flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-cyan-950/50 transition-all active:scale-[0.98] cursor-pointer"
+            className="w-full h-10 px-3 flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition-all"
           >
             <Play className="w-4 h-4 fill-slate-950 text-slate-950" />
             {(!isCollapsedDesktop || isOpenMobile) && <span>Start Load Test</span>}
