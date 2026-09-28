@@ -3,7 +3,7 @@ import { Menu, Play, Square, Settings, Activity, Clock, ShieldCheck } from 'luci
 import { LoadTestSnapshot } from '../types';
 
 interface HeaderProps {
-  currentTab: 'runner' | 'history' | 'scenarios';
+  currentTab: 'runner' | 'history' | 'scenarios' | 'scheduled';
   isRunning: boolean;
   onStartTest: () => void;
   onStopTest: () => void;
@@ -25,6 +25,8 @@ export const Header: React.FC<HeaderProps> = ({
     switch (currentTab) {
       case 'runner':
         return 'Live Runner & Telemetry';
+      case 'scheduled':
+        return 'Scheduled Pinger & Keep-Alive';
       case 'history':
         return 'Test Execution History';
       case 'scenarios':

@@ -1,35 +1,13 @@
 import express, { Request, Response } from 'express';
 import { LoadTestConfig, LoadTestRunner, LoadTestSnapshot } from './loadRunner';
+import { validateTargetUrl } from './validateUrl';
+import { cronManager } from './cronManager';
 
 export const apiRouter = express.Router();
 
 // In-memory registry of active and completed test runners
 const runners = new Map<string, LoadTestRunner>();
 const history: LoadTestSnapshot[] = [];
-
-// SSRF & Safety Validation
-function validateTargetUrl(rawUrl: string): { valid: boolean; error?: string; url?: string } {
-  try {
-    const parsed = new URL(rawUrl);
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
-      return { valid: false, error: 'Protocol must be http: or https:' };
-    }
-    const hostname = parsed.hostname.toLowerCase();
-
-    // Block cloud metadata services
-    if (
-      hostname === '169.254.169.254' ||
-      hostname === 'metadata.google.internal' ||
-      hostname === '100.100.100.200'
-    ) {
-      return { valid: false, error: 'Target URL is a protected cloud metadata address' };
-    }
-
-    return { valid: true, url: parsed.toString() };
-  } catch {
-    return { valid: false, error: 'Invalid URL format' };
-  }
-}
 
 // 1. Start a new load test
 apiRouter.post('/load-test/start', (req: Request, res: Response) => {
@@ -207,6 +185,83 @@ apiRouter.post('/load-test/ping', async (req: Request, res: Response) => {
       error: err?.message || 'Failed to ping target',
     });
   }
+});
+
+// ==========================================
+// 7. Scheduled Pinger (Auto Hit) Endpoints
+// ==========================================
+
+// Get all scheduled tasks
+apiRouter.get('/cron/tasks', (_req: Request, res: Response) => {
+  return res.json({
+    tasks: cronManager.getTasks(),
+  });
+});
+
+// Create new scheduled task
+apiRouter.post('/cron/tasks', (req: Request, res: Response) => {
+  const { url, name, method = 'GET', intervalSeconds = 300, headers = {}, body, timeoutMs = 8000, runImmediately = true } = req.body || {};
+  const validation = validateTargetUrl(url);
+
+  if (!validation.valid || !validation.url) {
+    return res.status(400).json({ error: validation.error || 'Invalid target URL' });
+  }
+
+  const validMethods = ['GET', 'POST', 'PUT', 'PATCH', 'HEAD'];
+  const safeMethod = validMethods.includes(method) ? method : 'GET';
+
+  const task = cronManager.createTask({
+    url: validation.url,
+    name,
+    method: safeMethod as any,
+    intervalSeconds: Math.max(10, Math.min(86400, parseInt(intervalSeconds, 10) || 300)),
+    headers: typeof headers === 'object' && headers !== null ? headers : {},
+    body: typeof body === 'string' ? body : undefined,
+    timeoutMs: Math.max(1000, Math.min(30000, parseInt(timeoutMs, 10) || 8000)),
+    runImmediately: Boolean(runImmediately),
+  });
+
+  return res.status(201).json({
+    task,
+    message: 'Scheduled pinger task created successfully',
+  });
+});
+
+// Toggle task active / paused
+apiRouter.post('/cron/tasks/:id/toggle', (req: Request, res: Response) => {
+  const updated = cronManager.toggleTask(req.params.id, req.body?.active);
+  if (!updated) {
+    return res.status(404).json({ error: 'Task not found' });
+  }
+  return res.json({ task: updated });
+});
+
+// Manually trigger immediate hit
+apiRouter.post('/cron/tasks/:id/run-now', async (req: Request, res: Response) => {
+  const task = cronManager.getTask(req.params.id);
+  if (!task) {
+    return res.status(404).json({ error: 'Task not found' });
+  }
+  const log = await cronManager.executeHit(task);
+  return res.json({ task, log });
+});
+
+// Delete task
+apiRouter.delete('/cron/tasks/:id', (req: Request, res: Response) => {
+  const success = cronManager.deleteTask(req.params.id);
+  if (!success) {
+    return res.status(404).json({ error: 'Task not found' });
+  }
+  return res.json({ success: true, message: 'Task deleted' });
+});
+
+// Clear logs for task
+apiRouter.post('/cron/tasks/:id/clear-logs', (req: Request, res: Response) => {
+  const success = cronManager.clearLogs(req.params.id);
+  if (!success) {
+    return res.status(404).json({ error: 'Task not found' });
+  }
+  return res.json({ success: true, message: 'Logs cleared' });
 });
 
 // 404 handler for undefined API routes

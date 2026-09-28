@@ -103,3 +103,35 @@ export interface PingResult {
   error?: string;
 }
 
+export interface CronHitLog {
+  id: string;
+  timestamp: number;
+  status: number;
+  statusText: string;
+  latencyMs: number;
+  bytes: number;
+  error?: string;
+}
+
+export interface ScheduledTask {
+  id: string;
+  name: string;
+  url: string;
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'HEAD';
+  intervalSeconds: number;
+  headers: Record<string, string>;
+  body?: string;
+  timeoutMs: number;
+  isActive: boolean;
+  createdAt: number;
+  lastRunTime?: number;
+  nextRunTime?: number;
+  totalRuns: number;
+  successRuns: number;
+  failedRuns: number;
+  lastStatus?: number;
+  lastLatencyMs?: number;
+  recentLogs: CronHitLog[];
+}
+
+

@@ -10,18 +10,20 @@ import {
   Play,
   Square,
   ShieldCheck,
+  Clock,
 } from 'lucide-react';
 import { LoadTestSnapshot } from '../types';
 
 interface SidebarProps {
-  currentTab: 'runner' | 'history' | 'scenarios';
-  setCurrentTab: (tab: 'runner' | 'history' | 'scenarios') => void;
+  currentTab: 'runner' | 'history' | 'scenarios' | 'scheduled';
+  setCurrentTab: (tab: 'runner' | 'history' | 'scenarios' | 'scheduled') => void;
   isRunning: boolean;
   onStartTest: () => void;
   onStopTest: () => void;
   onOpenSettings: () => void;
   historyCount: number;
   scenariosCount: number;
+  scheduledCount?: number;
   snapshot: LoadTestSnapshot | null;
   isOpenMobile: boolean;
   setIsOpenMobile: (open: boolean) => void;
@@ -38,6 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenSettings,
   historyCount,
   scenariosCount,
+  scheduledCount = 0,
   snapshot,
   isOpenMobile,
   setIsOpenMobile,
@@ -52,6 +55,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Activity,
       badge: isRunning ? 'LIVE' : null,
       badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30 animate-pulse',
+    },
+    {
+      id: 'scheduled' as const,
+      label: 'Scheduled Pinger',
+      description: 'Auto-hit every 5m / custom',
+      icon: Clock,
+      badge: scheduledCount > 0 ? String(scheduledCount) : null,
+      badgeColor: 'bg-cyan-950 text-cyan-400 border-cyan-800',
     },
     {
       id: 'history' as const,

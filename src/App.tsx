@@ -11,6 +11,7 @@ import { HistoryView } from './components/HistoryView';
 import { ScenariosView } from './components/ScenariosView';
 import { SettingsModal } from './components/SettingsModal';
 import { PdfReportModal } from './components/PdfReportModal';
+import { ScheduledPingerView } from './components/ScheduledPingerView';
 import {
   HttpMethod,
   HeaderItem,
@@ -20,11 +21,12 @@ import {
 } from './types';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<'runner' | 'history' | 'scenarios'>('runner');
+  const [currentTab, setCurrentTab] = useState<'runner' | 'history' | 'scenarios' | 'scheduled'>('runner');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isCollapsedDesktop, setIsCollapsedDesktop] = useState(false);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
   const [pdfReportSnapshot, setPdfReportSnapshot] = useState<LoadTestSnapshot | null>(null);
+  const [scheduledCount, setScheduledCount] = useState<number>(0);
 
   // Config parameters
   const [url, setUrl] = useState('');
@@ -77,7 +79,22 @@ export default function App() {
 
     // Fetch initial history from server
     fetchHistory();
+    fetchScheduledCount();
   }, []);
+
+  const fetchScheduledCount = async () => {
+    try {
+      const res = await fetch('/api/cron/tasks');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.tasks)) {
+          setScheduledCount(data.tasks.filter((t: any) => t.isActive).length);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  };
 
   const fetchHistory = async () => {
     try {
@@ -336,6 +353,7 @@ export default function App() {
         onOpenSettings={() => setIsSettingsOpen(true)}
         historyCount={history.length}
         scenariosCount={scenarios.length}
+        scheduledCount={scheduledCount}
         snapshot={snapshot}
         isOpenMobile={isMobileSidebarOpen}
         setIsOpenMobile={setIsMobileSidebarOpen}
@@ -436,6 +454,12 @@ export default function App() {
                 onDeleteScenario={handleDeleteScenario}
                 onSaveCurrentAsScenario={handleSaveScenario}
               />
+            </div>
+          )}
+
+          {currentTab === 'scheduled' && (
+            <div className="animate-in fade-in duration-200">
+              <ScheduledPingerView onShowToast={showToast} />
             </div>
           )}
         </main>
