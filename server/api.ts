@@ -209,74 +209,8 @@ apiRouter.post('/load-test/ping', async (req: Request, res: Response) => {
   }
 });
 
-// ----------------------------------------------------
-// BUILT-IN TARGET SANDBOX (For fast zero-setup testing)
-// ----------------------------------------------------
-
-apiRouter.all('/sandbox/fast-200', (_req: Request, res: Response) => {
-  return res.json({
-    status: 200,
-    message: 'PulseLoad Sandbox - Fast 200 OK',
-    timestamp: new Date().toISOString(),
-  });
-});
-
-apiRouter.all('/sandbox/delayed', async (req: Request, res: Response) => {
-  const ms = Math.min(2000, Math.max(10, parseInt(req.query.ms as string, 10) || 50));
-  await new Promise((r) => setTimeout(r, ms));
-  return res.json({
-    status: 200,
-    delay: `${ms}ms`,
-    timestamp: new Date().toISOString(),
-  });
-});
-
-apiRouter.all('/sandbox/flaky', (req: Request, res: Response) => {
-  const failRate = parseFloat(req.query.rate as string) || 0.2; // 20% fail rate
-  const shouldFail = Math.random() < failRate;
-  if (shouldFail) {
-    return res.status(500).json({
-      status: 500,
-      error: 'Simulated 500 Internal Server Error in sandbox',
-    });
-  }
-  return res.json({
-    status: 200,
-    message: 'Flaky request succeeded',
-  });
-});
-
-apiRouter.all('/sandbox/echo', (req: Request, res: Response) => {
-  return res.json({
-    method: req.method,
-    url: req.originalUrl,
-    headers: req.headers,
-    query: req.query,
-    body: req.body,
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// Mock CRUD Items Sandbox
-let mockItems = [
-  { id: 1, name: 'Item Alpha', price: 99.9, category: 'Hardware' },
-  { id: 2, name: 'Item Beta', price: 149.0, category: 'Cloud' },
-  { id: 3, name: 'Item Gamma', price: 49.5, category: 'Telemetry' },
-];
-
-apiRouter.get('/sandbox/items', (_req: Request, res: Response) => {
-  return res.json({ items: mockItems, total: mockItems.length });
-});
-
-apiRouter.post('/sandbox/items', (req: Request, res: Response) => {
-  const newItem = {
-    id: Date.now(),
-    name: req.body?.name || `Generated Item ${mockItems.length + 1}`,
-    price: Number(req.body?.price) || 29.99,
-    category: req.body?.category || 'General',
-  };
-  mockItems.push(newItem);
-  if (mockItems.length > 50) mockItems.shift();
-  return res.status(201).json(newItem);
+// 404 handler for undefined API routes
+apiRouter.use((_req: Request, res: Response) => {
+  return res.status(404).json({ error: 'Endpoint not found' });
 });
 

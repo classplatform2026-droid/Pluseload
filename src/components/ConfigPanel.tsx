@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   RotateCw,
-  Sparkles,
   Info,
 } from 'lucide-react';
 import { HttpMethod, HeaderItem, PingResult } from '../types';
@@ -153,45 +152,6 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
     }
   };
 
-  const loadPreset = (presetType: string) => {
-    const origin = window.location.origin;
-    if (presetType === 'fast') {
-      setUrl(`${origin}/api/sandbox/fast-200`);
-      setMethod('GET');
-      setConcurrency(10);
-      setDurationSeconds(10);
-    } else if (presetType === 'delayed') {
-      setUrl(`${origin}/api/sandbox/delayed?ms=75`);
-      setMethod('GET');
-      setConcurrency(15);
-      setDurationSeconds(10);
-    } else if (presetType === 'flaky') {
-      setUrl(`${origin}/api/sandbox/flaky?rate=0.2`);
-      setMethod('GET');
-      setConcurrency(8);
-      setDurationSeconds(10);
-    } else if (presetType === 'post-items') {
-      setUrl(`${origin}/api/sandbox/items`);
-      setMethod('POST');
-      setConcurrency(5);
-      setDurationSeconds(10);
-      setHeaders([
-        { id: '1', key: 'Content-Type', value: 'application/json', enabled: true },
-      ]);
-      setBody(
-        JSON.stringify(
-          {
-            name: 'Stress Test Payload',
-            price: 79.99,
-            category: 'Benchmark',
-          },
-          null,
-          2
-        )
-      );
-    }
-  };
-
   return (
     <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 md:p-5 shadow-xl backdrop-blur-sm space-y-4">
       {/* Top row: Target URL, Method selector & Action Button */}
@@ -221,7 +181,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             disabled={isRunning}
-            placeholder="https://example.com/api/v1/resource or choose a sandbox below..."
+            placeholder="https://api.yourdomain.com/v1/resource"
             className="w-full h-11 px-3 sm:px-4 text-xs md:text-sm font-mono text-slate-100 bg-slate-950 border border-slate-700/80 rounded-lg placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
           />
         </div>
@@ -296,42 +256,6 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           </button>
         </div>
       )}
-
-      {/* Quick Sandbox Target Selector Buttons */}
-      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs">
-        <span className="text-slate-400 flex items-center gap-1 font-medium text-[11px] sm:text-xs">
-          <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-          <span className="hidden xs:inline">Quick Presets:</span>
-        </span>
-        <button
-          type="button"
-          onClick={() => loadPreset('fast')}
-          className="px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-colors text-[11px] font-mono cursor-pointer"
-        >
-          Fast 200 (5ms)
-        </button>
-        <button
-          type="button"
-          onClick={() => loadPreset('delayed')}
-          className="px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-colors text-[11px] font-mono cursor-pointer"
-        >
-          Delayed 75ms
-        </button>
-        <button
-          type="button"
-          onClick={() => loadPreset('flaky')}
-          className="px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-colors text-[11px] font-mono cursor-pointer"
-        >
-          Flaky 20%
-        </button>
-        <button
-          type="button"
-          onClick={() => loadPreset('post-items')}
-          className="px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-colors text-[11px] font-mono cursor-pointer"
-        >
-          POST Item
-        </button>
-      </div>
 
       {/* Parameter Control Grid (Concurrency, Duration, Timeout, Total Requests, Interval) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-3 pt-2 border-t border-slate-800/70">

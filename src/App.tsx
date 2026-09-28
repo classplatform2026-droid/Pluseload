@@ -8,7 +8,6 @@ import { Charts } from './components/Charts';
 import { StatusCodeBreakdown } from './components/StatusCodeBreakdown';
 import { RequestLogs } from './components/RequestLogs';
 import { HistoryView } from './components/HistoryView';
-import { SandboxView } from './components/SandboxView';
 import { ScenariosView } from './components/ScenariosView';
 import { SettingsModal } from './components/SettingsModal';
 import { PdfReportModal } from './components/PdfReportModal';
@@ -21,7 +20,7 @@ import {
 } from './types';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<'runner' | 'history' | 'sandbox' | 'scenarios'>('runner');
+  const [currentTab, setCurrentTab] = useState<'runner' | 'history' | 'scenarios'>('runner');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isCollapsedDesktop, setIsCollapsedDesktop] = useState(false);
   const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
@@ -38,7 +37,7 @@ export default function App() {
   const [headers, setHeaders] = useState<HeaderItem[]>([
     { id: '1', key: 'Accept', value: 'application/json, */*', enabled: true },
   ]);
-  const [body, setBody] = useState<string>('{\n  "test": true\n}');
+  const [body, setBody] = useState<string>('');
 
   // Runtime State
   const [activeTestId, setActiveTestId] = useState<string | null>(null);
@@ -64,12 +63,8 @@ export default function App() {
   const eventSourceRef = useRef<EventSource | null>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Set default URL to sandbox on first load
+  // Load saved configurations and history on first load
   useEffect(() => {
-    if (!url && typeof window !== 'undefined') {
-      setUrl(`${window.location.origin}/api/sandbox/fast-200`);
-    }
-
     // Load saved scenarios from localStorage
     const saved = localStorage.getItem('pulseload_scenarios');
     if (saved) {
@@ -346,30 +341,11 @@ export default function App() {
         setIsOpenMobile={setIsMobileSidebarOpen}
         isCollapsedDesktop={isCollapsedDesktop}
         setIsCollapsedDesktop={setIsCollapsedDesktop}
-        onQuickLoadSandbox={(presetType) => {
-          const origin = window.location.origin;
-          if (presetType === 'fast') {
-            setUrl(`${origin}/api/sandbox/fast-200`);
-            setMethod('GET');
-            setConcurrency(10);
-            setDurationSeconds(10);
-          } else if (presetType === 'delayed') {
-            setUrl(`${origin}/api/sandbox/delayed?ms=75`);
-            setMethod('GET');
-            setConcurrency(15);
-            setDurationSeconds(10);
-          } else if (presetType === 'flaky') {
-            setUrl(`${origin}/api/sandbox/flaky?rate=0.2`);
-            setMethod('GET');
-            setConcurrency(8);
-            setDurationSeconds(10);
-          }
-        }}
       />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
-        {/* Top Header with Mobile Hamburger & Context Info */}
+      {/* Main Content Area with Fixed Top Navbar */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+        {/* Top Header Fixed at top */}
         <Header
           currentTab={currentTab}
           isRunning={isRunning}
@@ -448,24 +424,6 @@ export default function App() {
                 onLoadConfig={handleLoadConfig}
                 onClearHistory={handleClearHistory}
                 onOpenPdfReport={(run) => handleOpenPdfReport(run)}
-              />
-            </div>
-          )}
-
-          {currentTab === 'sandbox' && (
-            <div className="animate-in fade-in duration-200">
-              <SandboxView
-                onSelectSandbox={(cfg) => {
-                  handleLoadConfig({
-                    url: cfg.url,
-                    method: cfg.method,
-                    concurrency: cfg.concurrency,
-                    durationSeconds: cfg.durationSeconds,
-                    timeoutMs: 5000,
-                    headers: cfg.headers || {},
-                    body: cfg.body,
-                  });
-                }}
               />
             </div>
           )}

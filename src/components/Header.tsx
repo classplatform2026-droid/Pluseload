@@ -3,7 +3,7 @@ import { Menu, Play, Square, Settings, Activity, Clock, ShieldCheck } from 'luci
 import { LoadTestSnapshot } from '../types';
 
 interface HeaderProps {
-  currentTab: 'runner' | 'history' | 'sandbox' | 'scenarios';
+  currentTab: 'runner' | 'history' | 'scenarios';
   isRunning: boolean;
   onStartTest: () => void;
   onStopTest: () => void;
@@ -29,8 +29,6 @@ export const Header: React.FC<HeaderProps> = ({
         return 'Test Execution History';
       case 'scenarios':
         return 'Saved Presets & SLA Profiles';
-      case 'sandbox':
-        return 'Built-in Target Sandbox APIs';
     }
   };
 
@@ -38,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
   const targetDuration = snapshot?.config.durationSeconds || 10;
 
   return (
-    <header className="sticky top-0 z-20 w-full border-b border-slate-800/80 bg-[#090d16]/95 backdrop-blur-md px-3 sm:px-6 py-2.5 flex items-center justify-between">
+    <header className="sticky top-0 z-30 w-full border-b border-slate-800/90 bg-[#090d16]/95 backdrop-blur-md px-3 sm:px-6 py-3 flex items-center justify-between shadow-md shadow-black/30 shrink-0">
       {/* Left: Mobile Hamburger & Page Title / Breadcrumb */}
       <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
         <button

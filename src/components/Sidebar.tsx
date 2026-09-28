@@ -3,25 +3,19 @@ import {
   Activity,
   History,
   BookmarkCheck,
-  BookOpen,
   Settings,
-  Layers,
   ChevronLeft,
   ChevronRight,
   X,
   Play,
   Square,
   ShieldCheck,
-  Zap,
-  Clock,
-  AlertTriangle,
-  Server,
 } from 'lucide-react';
 import { LoadTestSnapshot } from '../types';
 
 interface SidebarProps {
-  currentTab: 'runner' | 'history' | 'sandbox' | 'scenarios';
-  setCurrentTab: (tab: 'runner' | 'history' | 'sandbox' | 'scenarios') => void;
+  currentTab: 'runner' | 'history' | 'scenarios';
+  setCurrentTab: (tab: 'runner' | 'history' | 'scenarios') => void;
   isRunning: boolean;
   onStartTest: () => void;
   onStopTest: () => void;
@@ -33,7 +27,6 @@ interface SidebarProps {
   setIsOpenMobile: (open: boolean) => void;
   isCollapsedDesktop: boolean;
   setIsCollapsedDesktop: (collapsed: boolean) => void;
-  onQuickLoadSandbox?: (type: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -50,7 +43,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setIsOpenMobile,
   isCollapsedDesktop,
   setIsCollapsedDesktop,
-  onQuickLoadSandbox,
 }) => {
   const navItems = [
     {
@@ -77,20 +69,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: scenariosCount > 0 ? String(scenariosCount) : null,
       badgeColor: 'bg-slate-800 text-slate-400 border-slate-700',
     },
-    {
-      id: 'sandbox' as const,
-      label: 'Sandbox APIs',
-      description: '5 zero-setup targets',
-      icon: BookOpen,
-      badge: '5 APIs',
-      badgeColor: 'bg-cyan-950 text-cyan-400 border-cyan-800',
-    },
-  ];
-
-  const quickSandboxes = [
-    { id: 'fast', name: 'Fast 200 OK', icon: Zap, color: 'text-amber-400' },
-    { id: 'delayed', name: 'Delayed 75ms', icon: Clock, color: 'text-cyan-400' },
-    { id: 'flaky', name: 'Flaky Errors', icon: AlertTriangle, color: 'text-rose-400' },
   ];
 
   const sidebarContent = (
@@ -214,33 +192,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
-
-        {/* Quick Sandbox Targets shortcut */}
-        {(!isCollapsedDesktop || isOpenMobile) && onQuickLoadSandbox && (
-          <div className="pt-4 mt-3 border-t border-slate-800/60 space-y-1.5">
-            <div className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-              <span>Quick Presets</span>
-              <span className="text-cyan-400 font-mono">1-Click</span>
-            </div>
-            {quickSandboxes.map((s) => {
-              const Icon = s.icon;
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    onQuickLoadSandbox(s.id);
-                    setCurrentTab('runner');
-                    setIsOpenMobile(false);
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-850/50 rounded-lg transition-colors text-left font-mono cursor-pointer"
-                >
-                  <Icon className={`w-3.5 h-3.5 ${s.color} shrink-0`} />
-                  <span className="truncate">{s.name}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
 
         {/* Live Engine Status Mini-Widget */}
         {(!isCollapsedDesktop || isOpenMobile) && (
